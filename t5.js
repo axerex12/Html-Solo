@@ -11,6 +11,75 @@ let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('loginBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeLoginModal = document.getElementById('closeLoginModal');
+  const loginForm = document.getElementById('loginForm');
+
+  // Open login modal
+  loginBtn.addEventListener('click', () => {
+    loginModal.showModal();
+  });
+
+  // Close login modal
+  closeLoginModal.addEventListener('click', () => {
+    loginModal.close();
+  });
+
+  // Handle form submission
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
+
+    try {
+      // Here you would typically make an API call to your authentication service
+      // This is just a mock implementation
+      const isAuthenticated = await mockLogin(username, password, email);
+
+      if (isAuthenticated) {
+        // Update UI for logged-in state
+        loginBtn.textContent = 'Logout';
+        loginBtn.removeEventListener('click', loginClickHandler);
+        loginBtn.addEventListener('click', logoutClickHandler);
+        loginModal.close();
+        alert('Login successful!');
+      } else {
+        alert('Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
+    }
+  });
+
+  // Mock login function - replace with real API call
+  async function mockLogin(username, password) {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Very basic mock validation
+    return username === 'admin' && password === 'password';
+  }
+
+  // Login click handler (initial state)
+  function loginClickHandler() {
+    loginModal.showModal();
+  }
+
+  // Logout click handler
+  function logoutClickHandler() {
+    // Reset UI to logged-out state
+    loginBtn.textContent = 'Login';
+    loginBtn.removeEventListener('click', logoutClickHandler);
+    loginBtn.addEventListener('click', loginClickHandler);
+    alert('You have been logged out.');
+  }
+});
+
 const getWeeklyMenu = async (id, lang) => {
   try{
     return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
