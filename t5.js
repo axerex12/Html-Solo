@@ -11,14 +11,100 @@ let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
 
-const getWeeklyMenu = async (id, lang) => {
-  try{
-    return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
-  }catch (error){
-    console.error('Error happened Perkele', error);
-    return null
+// Login functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('loginBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeLoginModal = document.getElementById('closeLoginModal');
+  const loginForm = document.getElementById('loginForm');
+
+  // Open login modal
+  loginBtn.addEventListener('click', () => {
+    loginModal.showModal();
+  });
+
+  // Close login modal
+  closeLoginModal.addEventListener('click', () => {
+    loginModal.close();
+  });
+
+  // Handle form submission
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
+
+    try {
+      const isAuthenticated = await mockLogin(username, password, email);
+
+      if (isAuthenticated) {
+        // Update UI for logged-in state
+        loginBtn.textContent = 'Logout';
+        loginBtn.removeEventListener('click', loginClickHandler);
+        loginBtn.addEventListener('click', logoutClickHandler);
+        loginModal.close();
+        alert('Login successful!');
+      } else {
+        alert('Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
+    }
+  });
+
+  // Mock login function - replace with real API call
+  async function mockLogin(username, password, email) {
+    try {
+      const response = await fetch(`${baseUrl}/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          email: email,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   }
-}
+
+  // Login click handler (initial state)
+  function loginClickHandler() {
+    loginModal.showModal();
+  }
+
+  // Logout click handler
+  function logoutClickHandler() {
+    // Reset UI to logged-out state
+    loginBtn.textContent = 'Login';
+    loginBtn.removeEventListener('click', logoutClickHandler);
+    loginBtn.addEventListener('click', loginClickHandler);
+    alert('You have been logged out.');
+  }
+});
+const getWeeklyMenu = async (id, lang) => {
+  try {
+    return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
+  } catch (error) {
+    console.error('Error happened Perkele', error);
+    return null;
+  }
+};
 
 // Fetches the daily menu for a restaurant
 const getDailyMenu = async (id, lang) => {
@@ -55,7 +141,7 @@ const createTable = (restaurantsToShow = restaurants) => {
   </tr>
   `;
 
-  restaurantsToShow.forEach(restaurant => {
+  restaurantsToShow.forEach((restaurant) => {
     const {_id} = restaurant;
     const tr = restaurantRow(restaurant);
     table.append(tr);
@@ -63,23 +149,21 @@ const createTable = (restaurantsToShow = restaurants) => {
     tr.addEventListener('click', async () => {
       try {
         // Remove existing highlights using forEach
-        document.querySelectorAll('.highlight').forEach(elem => {
+        document.querySelectorAll('.highlight').forEach((elem) => {
           elem.classList.remove('highlight');
         });
         tr.classList.add('highlight');
 
         // Fetch and display the daily menu
-        if (currentMenu === 'daily'){
+        if (currentMenu === 'daily') {
           const courseResponse = await getDailyMenu(_id, 'fi');
           console.log(courseResponse);
 
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
           modal.showModal();
-        }
-        else if(currentMenu === 'weekly'){
+        } else if (currentMenu === 'weekly') {
           const courseResponse = await getWeeklyMenu(_id, 'fi');
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
-
 
           modal.showModal();
         }
@@ -104,27 +188,26 @@ const handleFilterClick = (company, filterName) => {
     // Apply the filter
     currentFilter = filterName;
     const buttons = {sodexo: sodexoButton, compass: compassButton};
-    Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+    Object.values(buttons).forEach((btn) => btn.classList.remove('active'));
     buttons[filterName].classList.add('active');
 
-    const filtered = restaurants.filter(r =>
-      r.company.toLowerCase() === company.toLowerCase()
+    const filtered = restaurants.filter(
+      (r) => r.company.toLowerCase() === company.toLowerCase()
     );
     createTable(filtered);
   }
 };
 
 const handleMenuClick = () => {
-  if(currentMenu === 'daily'){
-    menuButton.innerText = 'weekly'
+  if (currentMenu === 'daily') {
+    menuButton.innerText = 'weekly';
 
-    currentMenu = 'weekly'
+    currentMenu = 'weekly';
+  } else {
+    currentMenu = 'daily';
+    menuButton.innerText = 'daily';
   }
-  else{
-    currentMenu = 'daily'
-    menuButton.innerText = 'daily'
-  }
-}
+};
 
 // Event listeners for the buttons
 sodexoButton.addEventListener('click', () =>
@@ -135,9 +218,7 @@ compassButton.addEventListener('click', () =>
   handleFilterClick('compass group', 'compass')
 );
 
-menuButton.addEventListener('click', () =>
-  handleMenuClick()
-);
+menuButton.addEventListener('click', () => handleMenuClick());
 
 // Main function to initialize the app
 const main = async () => {
