@@ -30,7 +30,7 @@ td {
   background-color: chartreuse;
 }
 
-button.active {
-  background-color: #4CAF50;
+.active {
+  background-color: #4caf50;
   color: white;
 }

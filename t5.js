@@ -6,8 +6,19 @@ const table = document.querySelector('#target');
 const modal = document.querySelector('#modal');
 const sodexoButton = document.getElementById('sodexoB');
 const compassButton = document.getElementById('compassB');
+const menuButton = document.getElementById('weekday');
 let currentFilter = null;
+let currentMenu = 'daily';
 let restaurants = [];
+
+const getWeeklyMenu = async (id, lang) => {
+  try{
+    return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
+  }catch (error){
+    console.error('Error happened Perkele', error);
+    return null
+  }
+}
 
 // Fetches the daily menu for a restaurant
 const getDailyMenu = async (id, lang) => {
@@ -58,9 +69,20 @@ const createTable = (restaurantsToShow = restaurants) => {
         tr.classList.add('highlight');
 
         // Fetch and display the daily menu
-        const courseResponse = await getDailyMenu(_id, 'fi');
-        modal.innerHTML = restaurantModal(restaurant, courseResponse);
-        modal.showModal();
+        if (currentMenu === 'daily'){
+          const courseResponse = await getDailyMenu(_id, 'fi');
+          console.log(courseResponse);
+
+          modal.innerHTML = restaurantModal(restaurant, courseResponse);
+          modal.showModal();
+        }
+        else if(currentMenu === 'weekly'){
+          const courseResponse = await getWeeklyMenu(_id, 'fi');
+          modal.innerHTML = restaurantModal(restaurant, courseResponse);
+
+
+          modal.showModal();
+        }
       } catch (error) {
         console.error('An error occurred:', error);
       }
@@ -92,6 +114,18 @@ const handleFilterClick = (company, filterName) => {
   }
 };
 
+const handleMenuClick = () => {
+  if(currentMenu === 'daily'){
+    menuButton.innerText = 'weekly'
+
+    currentMenu = 'weekly'
+  }
+  else{
+    currentMenu = 'daily'
+    menuButton.innerText = 'daily'
+  }
+}
+
 // Event listeners for the buttons
 sodexoButton.addEventListener('click', () =>
   handleFilterClick('sodexo', 'sodexo')
@@ -99,6 +133,10 @@ sodexoButton.addEventListener('click', () =>
 
 compassButton.addEventListener('click', () =>
   handleFilterClick('compass group', 'compass')
+);
+
+menuButton.addEventListener('click', () =>
+  handleMenuClick()
 );
 
 // Main function to initialize the app
