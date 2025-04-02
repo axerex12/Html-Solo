@@ -11,142 +11,220 @@ let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
 
-const getWeeklyMenu = async (id, lang) => {
-  try{
-    return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
-  }catch (error){
-    console.error('Error happened Perkele', error);
-    return null
-  }
-}
+// Login functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('loginBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeLoginModal = document.getElementById('closeLoginModal');
+  const loginForm = document.getElementById('loginForm');
 
-// Fetches the daily menu for a restaurant
-const getDailyMenu = async (id, lang) => {
+  // Initialize UI based on auth state
+  const checkAuthState = () => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      updateUILoggedInState(JSON.parse(user));
+    }
+  };
+
+  // Open login modal
+  const loginClickHandler = () => {
+    loginModal.showModal();
+    document.getElementById('loginError').style.display = 'none';
+  };
+
+  // Close login modal
+  closeLoginModal.addEventListener('click', () => {
+    loginModal.close();
+  });
+
+  // Handle form submission
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorElement = document.getElementById('loginError');
+
+    // Show loading state
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.textContent = 'Logging in...';
+    submitButton.disabled = true;
+
+    try {
+      const response = await loginUser(username, password);
+      handleSuccessfulLogin(response);
+      loginModal.close();
+      updateUILoggedInState(response.user);
+    } catch (error) {
+      errorElement.textContent = error.message || 'Login failed. Please try again.';
+      errorElement.style.display = 'block';
+    } finally {
+      submitButton.textContent = originalButtonText;
+      submitButton.disabled = false;
+    }
+  });
+
+  // Real login function using your baseUrl
+  const loginUser = async (username, password) => {
+    try {
+      const response = await fetch(`${baseUrl}/auth/login`, { // Adjust endpoint as needed
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password
+        }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const handleSuccessfulLogin = (response) => {
+    if (response.accessToken) {
+      localStorage.setItem('accessToken', response.accessToken);
+    }
+    if (response.user) {
+      localStorage.setItem('user', JSON.stringify(response.user));
+    }
+  };
+
+  const updateUILoggedInState = (userData) => {
+    loginBtn.textContent = 'Logout';
+    loginBtn.removeEventListener('click', loginClickHandler);
+    loginBtn.addEventListener('click', logoutClickHandler);
+
+    // Update UI with user info if needed
+    console.log('Logged in as:', userData.username);
+  };
+
+  const logoutClickHandler = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    loginBtn.textContent = 'Login';
+    loginBtn.removeEventListener('click', logoutClickHandler);
+    loginBtn.addEventListener('click', loginClickHandler);
+    console.log('User logged out');
+  };
+
+  // Initialize auth state
+  checkAuthState();
+  loginBtn.addEventListener('click', loginClickHandler);
+});
+
+// Restaurant data functions
+const getWeeklyMenu = async (id, lang) => {
   try {
-    return await fetchData(`${baseUrl}/restaurants/daily/${id}/${lang}`);
+    return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error('Error fetching weekly menu:', error);
     return null;
   }
 };
 
-// Fetches the list of restaurants
-const getRestaurants = async () => {
+const getDailyMenu = async (id, lang) => {
   try {
-    restaurants = await fetchData(`${baseUrl}/restaurants`);
+    return await fetchData(`${baseUrl}/restaurants/daily/${id}/${lang}`);
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error('Error fetching daily menu:', error);
+    return null;
   }
 };
 
-// Sorts restaurants alphabetically by name
+const getRestaurants = async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    restaurants = await fetchData(`${baseUrl}/restaurants`, { headers });
+  } catch (error) {
+    console.error('Error fetching restaurants:', error);
+    throw error;
+  }
+};
+
 const sortRestaurants = () => {
   restaurants.sort(({name: nameA}, {name: nameB}) =>
     nameA.toUpperCase().localeCompare(nameB.toUpperCase())
   );
 };
 
-// Creates the table of restaurants
 const createTable = (restaurantsToShow = restaurants) => {
-  // Clear the table first
-  table.innerHTML = `<tr>
-    <th>Name</th>
-    <th>Address</th>
-  </tr>
+  table.innerHTML = `
+    <tr>
+      <th>Name</th>
+      <th>Address</th>
+    </tr>
   `;
 
-  restaurantsToShow.forEach(restaurant => {
-    const {_id} = restaurant;
+  restaurantsToShow.forEach((restaurant) => {
     const tr = restaurantRow(restaurant);
-    table.append(tr);
-
     tr.addEventListener('click', async () => {
       try {
-        // Remove existing highlights using forEach
-        document.querySelectorAll('.highlight').forEach(elem => {
+        document.querySelectorAll('.highlight').forEach((elem) => {
           elem.classList.remove('highlight');
         });
         tr.classList.add('highlight');
 
-        // Fetch and display the daily menu
-        if (currentMenu === 'daily'){
-          const courseResponse = await getDailyMenu(_id, 'fi');
-          console.log(courseResponse);
-
-          modal.innerHTML = restaurantModal(restaurant, courseResponse);
-          modal.showModal();
-        }
-        else if(currentMenu === 'weekly'){
-          const courseResponse = await getWeeklyMenu(_id, 'fi');
-          modal.innerHTML = restaurantModal(restaurant, courseResponse);
-
-
-          modal.showModal();
-        }
+        const menuFunc = currentMenu === 'daily' ? getDailyMenu : getWeeklyMenu;
+        const menu = await menuFunc(restaurant._id, 'fi');
+        modal.innerHTML = restaurantModal(restaurant, menu);
+        modal.showModal();
       } catch (error) {
-        console.error('An error occurred:', error);
+        console.error('Error showing restaurant details:', error);
       }
     });
-
     table.append(tr);
   });
 };
 
-// Helper function to handle filter button clicks
 const handleFilterClick = (company, filterName) => {
   if (currentFilter === filterName) {
-    // If filter is already active, remove it
     currentFilter = null;
     sodexoButton.classList.remove('active');
     compassButton.classList.remove('active');
     createTable();
   } else {
-    // Apply the filter
     currentFilter = filterName;
-    const buttons = {sodexo: sodexoButton, compass: compassButton};
-    Object.values(buttons).forEach(btn => btn.classList.remove('active'));
-    buttons[filterName].classList.add('active');
+    [sodexoButton, compassButton].forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${filterName}B`).classList.add('active');
 
-    const filtered = restaurants.filter(r =>
-      r.company.toLowerCase() === company.toLowerCase()
+    const filtered = restaurants.filter(
+      (r) => r.company.toLowerCase() === company.toLowerCase()
     );
     createTable(filtered);
   }
 };
 
 const handleMenuClick = () => {
-  if(currentMenu === 'daily'){
-    menuButton.innerText = 'weekly'
+  currentMenu = currentMenu === 'daily' ? 'weekly' : 'daily';
+  menuButton.textContent = currentMenu;
+};
 
-    currentMenu = 'weekly'
-  }
-  else{
-    currentMenu = 'daily'
-    menuButton.innerText = 'daily'
-  }
-}
+// Event listeners
+sodexoButton.addEventListener('click', () => handleFilterClick('sodexo', 'sodexo'));
+compassButton.addEventListener('click', () => handleFilterClick('compass group', 'compass'));
+menuButton.addEventListener('click', handleMenuClick);
 
-// Event listeners for the buttons
-sodexoButton.addEventListener('click', () =>
-  handleFilterClick('sodexo', 'sodexo')
-);
-
-compassButton.addEventListener('click', () =>
-  handleFilterClick('compass group', 'compass')
-);
-
-menuButton.addEventListener('click', () =>
-  handleMenuClick()
-);
-
-// Main function to initialize the app
+// Main function
 const main = async () => {
   try {
     await getRestaurants();
     sortRestaurants();
     createTable();
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error('Initialization error:', error);
   }
 };
 
