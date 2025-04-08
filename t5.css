@@ -90,3 +90,19 @@ td {
   background-color: #4caf50;
   color: white;
 }
+
+#map {
+  flex: 1;
+  max-width: 50%;
+  height: 400px;
+}
+
+#content {
+  display: flex;
+  gap: 20px;
+}
+
+#target {
+  flex: 1;
+  max-width: 50%;
+}

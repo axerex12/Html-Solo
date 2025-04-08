@@ -1,6 +1,7 @@
 import {baseUrl} from './variables.js';
 import {fetchData} from './utils.js';
 import {restaurantRow, restaurantModal} from './components.js';
+import {panToCoordinates} from './map.js';
 
 const table = document.querySelector('#target');
 const modal = document.querySelector('#modal');
@@ -11,92 +12,6 @@ let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
 
-// Login functionality
-document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.getElementById('loginBtn');
-  const loginModal = document.getElementById('loginModal');
-  const closeLoginModal = document.getElementById('closeLoginModal');
-  const loginForm = document.getElementById('loginForm');
-
-  // Open login modal
-  loginBtn.addEventListener('click', () => {
-    loginModal.showModal();
-  });
-
-  // Close login modal
-  closeLoginModal.addEventListener('click', () => {
-    loginModal.close();
-  });
-
-  // Handle form submission
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const email = document.getElementById('email').value;
-
-    try {
-      const isAuthenticated = await mockLogin(username, password, email);
-
-      if (isAuthenticated) {
-        // Update UI for logged-in state
-        loginBtn.textContent = 'Logout';
-        loginBtn.removeEventListener('click', loginClickHandler);
-        loginBtn.addEventListener('click', logoutClickHandler);
-        loginModal.close();
-        alert('Login successful!');
-      } else {
-        alert('Invalid credentials');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed. Please try again.');
-    }
-  });
-
-  // Mock login function - replace with real API call
-  async function mockLogin(username, password, email) {
-    try {
-      const response = await fetch(`${baseUrl}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-          email: email,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-      const data = await response.json();
-      return data;
-
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  }
-
-  // Login click handler (initial state)
-  function loginClickHandler() {
-    loginModal.showModal();
-  }
-
-  // Logout click handler
-  function logoutClickHandler() {
-    // Reset UI to logged-out state
-    loginBtn.textContent = 'Login';
-    loginBtn.removeEventListener('click', logoutClickHandler);
-    loginBtn.addEventListener('click', loginClickHandler);
-    alert('You have been logged out.');
-  }
-});
 const getWeeklyMenu = async (id, lang) => {
   try {
     return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
@@ -166,6 +81,16 @@ const createTable = (restaurantsToShow = restaurants) => {
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
 
           modal.showModal();
+        }
+
+        // Pan the map to the restaurant's coordinates
+        if (restaurant.location && restaurant.location.coordinates) {
+          const [longitude, latitude] = restaurant.location.coordinates;
+          panToCoordinates([latitude, longitude]);
+        } else {
+          console.error(
+            `No valid coordinates for restaurant: ${restaurant.name}`
+          );
         }
       } catch (error) {
         console.error('An error occurred:', error);
