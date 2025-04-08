@@ -1,6 +1,7 @@
 import {baseUrl} from './variables.js';
 import {fetchData} from './utils.js';
 import {restaurantRow, restaurantModal} from './components.js';
+import {panToCoordinates} from './map.js';
 
 const table = document.querySelector('#target');
 const modal = document.querySelector('#modal');
@@ -12,13 +13,13 @@ let currentMenu = 'daily';
 let restaurants = [];
 
 const getWeeklyMenu = async (id, lang) => {
-  try{
+  try {
     return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
-  }catch (error){
+  } catch (error) {
     console.error('Error happened Perkele', error);
-    return null
+    return null;
   }
-}
+};
 
 // Fetches the daily menu for a restaurant
 const getDailyMenu = async (id, lang) => {
@@ -55,7 +56,7 @@ const createTable = (restaurantsToShow = restaurants) => {
   </tr>
   `;
 
-  restaurantsToShow.forEach(restaurant => {
+  restaurantsToShow.forEach((restaurant) => {
     const {_id} = restaurant;
     const tr = restaurantRow(restaurant);
     table.append(tr);
@@ -63,25 +64,33 @@ const createTable = (restaurantsToShow = restaurants) => {
     tr.addEventListener('click', async () => {
       try {
         // Remove existing highlights using forEach
-        document.querySelectorAll('.highlight').forEach(elem => {
+        document.querySelectorAll('.highlight').forEach((elem) => {
           elem.classList.remove('highlight');
         });
         tr.classList.add('highlight');
 
         // Fetch and display the daily menu
-        if (currentMenu === 'daily'){
+        if (currentMenu === 'daily') {
           const courseResponse = await getDailyMenu(_id, 'fi');
           console.log(courseResponse);
 
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
           modal.showModal();
-        }
-        else if(currentMenu === 'weekly'){
+        } else if (currentMenu === 'weekly') {
           const courseResponse = await getWeeklyMenu(_id, 'fi');
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
 
-
           modal.showModal();
+        }
+
+        // Pan the map to the restaurant's coordinates
+        if (restaurant.location && restaurant.location.coordinates) {
+          const [longitude, latitude] = restaurant.location.coordinates;
+          panToCoordinates([latitude, longitude]);
+        } else {
+          console.error(
+            `No valid coordinates for restaurant: ${restaurant.name}`
+          );
         }
       } catch (error) {
         console.error('An error occurred:', error);
@@ -104,27 +113,26 @@ const handleFilterClick = (company, filterName) => {
     // Apply the filter
     currentFilter = filterName;
     const buttons = {sodexo: sodexoButton, compass: compassButton};
-    Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+    Object.values(buttons).forEach((btn) => btn.classList.remove('active'));
     buttons[filterName].classList.add('active');
 
-    const filtered = restaurants.filter(r =>
-      r.company.toLowerCase() === company.toLowerCase()
+    const filtered = restaurants.filter(
+      (r) => r.company.toLowerCase() === company.toLowerCase()
     );
     createTable(filtered);
   }
 };
 
 const handleMenuClick = () => {
-  if(currentMenu === 'daily'){
-    menuButton.innerText = 'weekly'
+  if (currentMenu === 'daily') {
+    menuButton.innerText = 'weekly';
 
-    currentMenu = 'weekly'
+    currentMenu = 'weekly';
+  } else {
+    currentMenu = 'daily';
+    menuButton.innerText = 'daily';
   }
-  else{
-    currentMenu = 'daily'
-    menuButton.innerText = 'daily'
-  }
-}
+};
 
 // Event listeners for the buttons
 sodexoButton.addEventListener('click', () =>
@@ -135,9 +143,7 @@ compassButton.addEventListener('click', () =>
   handleFilterClick('compass group', 'compass')
 );
 
-menuButton.addEventListener('click', () =>
-  handleMenuClick()
-);
+menuButton.addEventListener('click', () => handleMenuClick());
 
 // Main function to initialize the app
 const main = async () => {
