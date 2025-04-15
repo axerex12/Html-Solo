@@ -1,9 +1,10 @@
 
-export const restaurantRow = ({ name, company }) => {
+export const restaurantRow = ({ name, company, city }) => {
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>${name}</td>
     <td>${company}</td>
+    <td>${city}</td>
   `;
   return tr;
 };

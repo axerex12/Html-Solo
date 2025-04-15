@@ -44,13 +44,25 @@ export function addMarker(coordinates, popupContent = '') {
       marker.bindPopup(popupContent);
     }
     markers.push(marker);
+    return marker; // Return the marker reference
   }
+  return null;
 }
 
 // Clear all markers from the map
 export function clearMarkers() {
-  markers.forEach((marker) => map.removeLayer(marker));
+  if (!map) {
+    console.error('Cannot clear markers - map not initialized');
+    return;
+  }
+
+  markers.forEach((marker) => {
+    if (marker && map.hasLayer(marker)) {
+      map.removeLayer(marker);
+    }
+  });
   markers = [];
+  console.log('All markers cleared');
 }
 
 // Function to pan the map to specific coordinates
@@ -78,20 +90,20 @@ export function panToCoordinates(coordinates) {
   }
 }
 
-// Add markers to the map
-function addMarkers(restaurants) {
-  restaurants.forEach((restaurant) => {
+// Add markers to the map and store them in the markers array
+export function addMarkers(restaurantsData) {
+  clearMarkers(); // Clear existing markers first
+
+  restaurantsData.forEach((restaurant) => {
     const [longitude, latitude] = restaurant.location.coordinates;
 
     if (typeof latitude === 'number' && typeof longitude === 'number') {
-      const marker = L.marker([latitude, longitude]).addTo(map);
-
       const popupContent = `
-                <h3>${restaurant.name}</h3>
-                <p>${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}</p>
-            `;
+        <h3>${restaurant.name}</h3>
+        <p>${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}</p>
+      `;
 
-      marker.bindPopup(popupContent);
+      addMarker([latitude, longitude], popupContent);
     } else {
       console.error(`Invalid coordinates for restaurant: ${restaurant.name}`);
     }
@@ -103,9 +115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   initMap();
 
   try {
-    const restaurants = await fetchRestaurants();
+    restaurants = await fetchRestaurants(); // Assign to global variable
     console.log('restaurants:', restaurants);
     addMarkers(restaurants);
+
+    // Add event listener for clear markers button
+    const clearButton = document.getElementById('clearMarkers');
+    if (clearButton) {
+      clearButton.addEventListener('click', () => {
+        clearMarkers();
+      });
+    } else {
+      console.error('Clear markers button not found');
+    }
   } catch (error) {
     console.error('Error fetching restaurants:', error);
   }

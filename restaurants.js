@@ -1,7 +1,7 @@
 import {baseUrl} from './variables.js';
 import {fetchData} from './utils.js';
 import {restaurantRow, restaurantModal} from './components.js';
-import {panToCoordinates} from './map.js';
+import {addMarkers, panToCoordinates} from './map.js';
 
 const table = document.querySelector('#target');
 const modal = document.querySelector('#modal');
@@ -52,18 +52,18 @@ const createTable = (restaurantsToShow = restaurants) => {
   // Clear the table first
   table.innerHTML = `<tr>
     <th>Name</th>
-    <th>Address</th>
+    <th>Company</th>
+    <th>City</th>
   </tr>
   `;
 
   restaurantsToShow.forEach((restaurant) => {
-    const {_id} = restaurant;
+    const { _id } = restaurant;
     const tr = restaurantRow(restaurant);
     table.append(tr);
 
     tr.addEventListener('click', async () => {
       try {
-        // Remove existing highlights using forEach
         document.querySelectorAll('.highlight').forEach((elem) => {
           elem.classList.remove('highlight');
         });
@@ -72,14 +72,11 @@ const createTable = (restaurantsToShow = restaurants) => {
         // Fetch and display the daily menu
         if (currentMenu === 'daily') {
           const courseResponse = await getDailyMenu(_id, 'fi');
-          console.log(courseResponse);
-
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
           modal.showModal();
         } else if (currentMenu === 'weekly') {
           const courseResponse = await getWeeklyMenu(_id, 'fi');
           modal.innerHTML = restaurantModal(restaurant, courseResponse);
-
           modal.showModal();
         }
 
@@ -112,7 +109,7 @@ const handleFilterClick = (company, filterName) => {
   } else {
     // Apply the filter
     currentFilter = filterName;
-    const buttons = {sodexo: sodexoButton, compass: compassButton};
+    const buttons = { sodexo: sodexoButton, compass: compassButton };
     Object.values(buttons).forEach((btn) => btn.classList.remove('active'));
     buttons[filterName].classList.add('active');
 
@@ -157,3 +154,19 @@ const main = async () => {
 };
 
 main();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const citySearch = document.getElementById('citySearch');
+
+  citySearch.addEventListener('input', () => {
+    const searchValue = citySearch.value.toLowerCase();
+
+    const filteredRestaurants = restaurants.filter((restaurant) =>
+      restaurant.city.toLowerCase().includes(searchValue)
+    );
+
+    console.log('Filtered restaurants by city:', filteredRestaurants); // Debugging log
+    createTable(filteredRestaurants);
+    addMarkers(filteredRestaurants); // Update the table and map markers
+  });
+});

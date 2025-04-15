@@ -1,33 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById('loginBtn');
+  const profileBtn = document.getElementById('profileBtn'); // Add reference to profile button
   const loginModal = document.getElementById('loginModal');
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginForm = document.getElementById('loginForm');
-  const profileBtn = document.getElementById('profileBtn');
 
-  let isLoggedIn = false; // Track login state
+  let isLoggedIn = false;
 
-  // Open login modal or handle logout
   loginBtn.addEventListener('click', () => {
     if (isLoggedIn) {
       // Handle logout
       isLoggedIn = false;
-      localStorage.removeItem('token'); // Clear the token
-      loginBtn.textContent = 'Login'; // Update button text
-      profileBtn.style.display = 'none'; // Hide profile button
+      localStorage.removeItem('token');
+      loginBtn.textContent = 'Login';
+      profileBtn.style.display = 'none'; // Hide profile button on logout
       alert('Logged out successfully!');
     } else {
-      // Open login modal
       loginModal.showModal();
     }
   });
 
-  // Close login modal
   closeLoginModal.addEventListener('click', () => {
     loginModal.close();
   });
 
-  // Handle form submission
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -37,58 +33,48 @@ document.addEventListener('DOMContentLoaded', () => {
       const isAuthenticated = await login(username, password);
 
       if (isAuthenticated) {
-        // Update UI for logged-in state
         isLoggedIn = true;
         loginBtn.textContent = 'Logout';
-        loginModal.close();
+        profileBtn.style.display = 'inline-block'; // Show profile button on successful login
+        loginModal.close(); // Close modal only on successful login
         alert('Login successful!');
       } else {
         alert('Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Login failed. Please try again.');
+
+      if (error.message === 'Invalid credentials') {
+        alert('Invalid credentials');
+      } else {
+        alert('Login failed. Please try again.');
+      }
     }
   });
 
   async function login(username, password) {
-    const response = await fetch('https://media2.edu.metropolia.fi/restaurant/api/v1/auth/login', {
+    const response = await fetch(
+      'https://media2.edu.metropolia.fi/restaurant/api/v1/auth/login',
+      {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
-    });
-    console.log(response);
-
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        body: JSON.stringify({username, password}),
       }
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
-      loginModal.close();
-      return data;
-  }
+    );
 
-  async function checkUserName(username) {
-    const response = await fetch(`https://media2.edu.metropolia.fi/restaurant/api/v1/users/available/:${username}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    console.log(response);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '');
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Handle invalid credentials
+        return false;
       }
-      const data = await response.json();
-      console.log(data);
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
 
-      return data;
+    const data = await response.json();
+    localStorage.setItem('token', data.token); // Save token to localStorage
+    return true; // Return true to indicate successful login
   }
-
 });
