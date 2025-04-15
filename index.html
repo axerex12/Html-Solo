@@ -14,6 +14,7 @@
     <script src="login.js" type="module"></script>
     <script src="register.js" type="module"></script>
     <script src="map.js" type="module"></script>
+    <script src="profile.js" type="module"></script>
   </head>
 
   <body>
@@ -21,6 +22,7 @@
       <h1>Restaurant Finder</h1>
       <div class="auth-buttons">
         <button id="loginBtn" class="auth-button login">Login</button>
+        <button id="profileBtn" style="display: none">Profile</button>
         <button id="reginBtn" class="auth-button register">Register</button>
       </div>
     </header>
@@ -31,7 +33,12 @@
         <button id="compassB" class="filter-button">Compass Restaurants</button>
         <button id="weekday" class="filter-button">Weekly/Daily Menu</button>
         <div class="search-container">
-          <input type="text" id="citySearch" placeholder="Search by city..." class="search-box">
+          <input
+            type="text"
+            id="citySearch"
+            placeholder="Search by city..."
+            class="search-box"
+          />
           <span class="search-icon">🔍</span>
         </div>
       </div>
@@ -68,7 +75,9 @@
         </div>
         <div class="form-actions">
           <button type="submit" class="submit-button">Log In</button>
-          <button type="button" id="closeLoginModal" class="cancel-button">Cancel</button>
+          <button type="button" id="closeLoginModal" class="cancel-button">
+            Cancel
+          </button>
         </div>
       </form>
     </dialog>
@@ -90,8 +99,29 @@
         </div>
         <div class="form-actions">
           <button type="submit" class="submit-button">Register</button>
-          <button type="button" id="closeRegisterModal" class="cancel-button">Cancel</button>
+          <button type="button" id="closeRegisterModal" class="cancel-button">
+            Cancel
+          </button>
         </div>
+      </form>
+    </dialog>
+
+    <dialog id="profileModal">
+      <form id="profileForm">
+        <h2>Update Profile</h2>
+        <label for="updateUsername">Username:</label>
+        <input type="text" id="updateUsername" name="updateUsername" required />
+        <label for="updateEmail">Email:</label>
+        <input type="email" id="updateEmail" name="updateEmail" required />
+        <label for="updatePassword">Password:</label>
+        <input
+          type="password"
+          id="updatePassword"
+          name="updatePassword"
+          required
+        />
+        <button type="submit">Update</button>
+        <button type="button" id="closeProfileModal">Cancel</button>
       </form>
     </dialog>
 

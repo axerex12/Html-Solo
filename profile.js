@@ -2,7 +2,6 @@ const profileBtn = document.getElementById('profileBtn');
 const profileModal = document.getElementById('profileModal');
 const closeProfileModal = document.getElementById('closeProfileModal');
 
-
 export const showProfileButton = () => {
   profileBtn.style.display = 'inline-block';
 };
