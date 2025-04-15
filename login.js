@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.textContent = 'Logout';
         loginModal.close();
         alert('Login successful!');
+        profileBtn.style.display = 'inline-block'; // Show profile button
       } else {
         alert('Invalid credentials');
       }
