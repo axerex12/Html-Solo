@@ -1,7 +1,7 @@
 import {baseUrl} from './variables.js';
 import {fetchData} from './utils.js';
 import {restaurantRow, restaurantModal} from './components.js';
-import {panToCoordinates} from './map.js';
+import {addMarkers, panToCoordinates} from './map.js';
 
 const table = document.querySelector('#target');
 const modal = document.querySelector('#modal');
@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     console.log('Filtered restaurants by city:', filteredRestaurants); // Debugging log
-    createTable(filteredRestaurants); // Update the table and map markers
+    createTable(filteredRestaurants);
+    addMarkers(filteredRestaurants); // Update the table and map markers
   });
 });

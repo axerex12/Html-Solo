@@ -91,7 +91,7 @@ export function panToCoordinates(coordinates) {
 }
 
 // Add markers to the map and store them in the markers array
-function addMarkers(restaurantsData) {
+export function addMarkers(restaurantsData) {
   clearMarkers(); // Clear existing markers first
 
   restaurantsData.forEach((restaurant) => {
