@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Finder</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="restaurants.js" type="module"></script>
+    <script src="login.js" type="module"></script>
+    <script src="register.js" type="module"></script>
+    <script src="map.js" type="module"></script>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <h1>Restaurant Finder</h1>
+      <div class="auth-buttons">
+        <button id="loginBtn" class="auth-button login">Login</button>
+        <button id="reginBtn" class="auth-button register">Register</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="filter-buttons">
+        <button id="sodexoB" class="filter-button">Sodexo Restaurants</button>
+        <button id="compassB" class="filter-button">Compass Restaurants</button>
+        <button id="weekday" class="filter-button">Weekly/Daily Menu</button>
+      </div>
+
+      <div id="content">
+        <table id="target" class="restaurant-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Table content will be generated here -->
+          </tbody>
+        </table>
+        <div id="map" class="restaurant-map"></div>
+      </div>
+    </main>
+
+    <dialog id="modal" class="custom-modal"></dialog>
+
+    <dialog id="loginModal" class="auth-modal">
+      <form id="loginForm" class="auth-form">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" required />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="submit-button">Log In</button>
+          <button type="button" id="closeLoginModal" class="cancel-button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="registerModal" class="auth-modal">
+      <form id="registerForm" class="auth-form">
+        <h2>Register</h2>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="registerusername" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="registerpassword" required />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="submit-button">Register</button>
+          <button type="button" id="closeRegisterModal" class="cancel-button">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+    <footer class="site-footer">
+      <p>&copy; 2023 Restaurant Finder. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

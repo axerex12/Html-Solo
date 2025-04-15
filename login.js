@@ -1,13 +1,25 @@
-// Login functionality
 document.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById('loginBtn');
   const loginModal = document.getElementById('loginModal');
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginForm = document.getElementById('loginForm');
+  const profileBtn = document.getElementById('profileBtn');
 
-  // Open login modal
+  let isLoggedIn = false; // Track login state
+
+  // Open login modal or handle logout
   loginBtn.addEventListener('click', () => {
-    loginModal.showModal();
+    if (isLoggedIn) {
+      // Handle logout
+      isLoggedIn = false;
+      localStorage.removeItem('token'); // Clear the token
+      loginBtn.textContent = 'Login'; // Update button text
+      profileBtn.style.display = 'none'; // Hide profile button
+      alert('Logged out successfully!');
+    } else {
+      // Open login modal
+      loginModal.showModal();
+    }
   });
 
   // Close login modal
@@ -26,9 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isAuthenticated) {
         // Update UI for logged-in state
+        isLoggedIn = true;
         loginBtn.textContent = 'Logout';
-        loginBtn.removeEventListener('click', loginClickHandler);
-        loginBtn.addEventListener('click', logoutClickHandler);
         loginModal.close();
         alert('Login successful!');
       } else {
@@ -56,12 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(errorData.message || 'Login failed');
       }
       const data = await response.json();
+      localStorage.setItem('token', data.token);
+      loginModal.close();
       return data;
-  }
-
-  // Login click handler (initial state)
-  function loginClickHandler() {
-    loginModal.showModal();
   }
 
   async function checkUserName(username) {
