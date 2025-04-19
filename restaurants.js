@@ -200,6 +200,11 @@ showfav.addEventListener('click', async () => {
       return;
     }
 
+    if (!favId) {
+      alert('you havent selected a favourite restaurant.');
+      return;
+    }
+
     const favoriteRestaurant = restaurants.find(
       (restaurant) => restaurant._id === favId
     );
