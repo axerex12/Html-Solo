@@ -249,6 +249,7 @@ showfav.addEventListener('click', async () => {
 // Main function to initialize the app
 const main = async () => {
   try {
+    localStorage.removeItem('token');
     await getRestaurants();
     sortRestaurants();
     createTable();
