@@ -106,6 +106,7 @@ const handleFilterClick = (company, filterName) => {
     sodexoButton.classList.remove('active');
     compassButton.classList.remove('active');
     createTable();
+    addMarkers(restaurants); // Show all markers
   } else {
     // Apply the filter
     currentFilter = filterName;
@@ -116,6 +117,7 @@ const handleFilterClick = (company, filterName) => {
     const filtered = restaurants.filter(
       (r) => r.company.toLowerCase() === company.toLowerCase()
     );
+    addMarkers(filtered); // Update the map markers
     createTable(filtered);
   }
 };

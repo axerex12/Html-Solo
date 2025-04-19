@@ -110,12 +110,11 @@ export function addMarkers(restaurantsData) {
   });
 }
 
-// Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
   initMap();
 
   try {
-    restaurants = await fetchRestaurants(); // Assign to global variable
+    restaurants = await fetchRestaurants();
     console.log('restaurants:', restaurants);
     addMarkers(restaurants);
 
