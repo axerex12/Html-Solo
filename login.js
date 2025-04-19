@@ -1,13 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById('loginBtn');
-  const profileBtn = document.getElementById('profileBtn'); // Add reference to profile button
+  const profileBtn = document.getElementById('profileBtn');
   const loginModal = document.getElementById('loginModal');
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginForm = document.getElementById('loginForm');
   const profileUsername = document.getElementById('profileUsername');
-  const profileFormSubmit = document.getElementById('profileForm')
+  const profilePictureElement = document.getElementById('avatar');
+  const profileFormSubmit = document.getElementById('profileForm');
 
   let isLoggedIn = false;
+
+  // Load profile picture and username from localStorage on page load
+  const savedProfilePicture = localStorage.getItem('profilePicture');
+  const savedUsername = localStorage.getItem('username');
+  if (savedProfilePicture) {
+    profilePictureElement.src = savedProfilePicture;
+  }
+  if (savedUsername) {
+    profileUsername.textContent = savedUsername;
+  }
 
   profileFormSubmit.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -19,10 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // Handle logout
       isLoggedIn = false;
       localStorage.removeItem('token');
+      localStorage.removeItem('profilePicture');
+      localStorage.removeItem('username');
       loginBtn.textContent = 'Login';
       profileBtn.style.display = 'none'; // Hide profile button on logout
       alert('Logged out successfully!');
       profileUsername.textContent = '';
+      profilePictureElement.src = '/images/default.png'; // Reset to default picture
     } else {
       loginModal.showModal();
     }
@@ -73,19 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     if (!response.ok) {
-      if (response.status === 401) {
-        // Handle invalid credentials
-        return false;
-      }
       const errorData = await response.json();
       throw new Error(errorData.message || 'Login failed');
     }
 
     const data = await response.json();
     localStorage.setItem('token', data.token); // Save token to localStorage
+    localStorage.setItem('username', username); // Save username to localStorage
     profileUsername.textContent = username || 'User';
+
+    // Check for profile picture
+    const profilePicture = data.avatar || '/images/default.png'; // Use default if none exists
+    localStorage.setItem('profilePicture', profilePicture); // Save profile picture to localStorage
+    profilePictureElement.src = profilePicture;
+
     return true; // Return true to indicate successful login
   }
 });
-
-

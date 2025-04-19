@@ -22,7 +22,7 @@
       <h1>Restaurant Finder</h1>
       <div class="auth-buttons">
         <button id="profileBtn" style="display: none" class="profile-button">
-          <img src="/images/default.png" alt="Profile" class="profile-pic" id="profilePic">
+          <img id = "profileImage" src="/images/default.png" alt="Profile" class="profile-pic" id="profilePic">
           <span class="profile-username" id="profileUsername">Username</span>
         </button>
         <button id="loginBtn" class="auth-button login">Login</button>
@@ -110,22 +110,38 @@
       </form>
     </dialog>
 
-    <dialog id="profileModal">
-      <form id="profileForm">
-        <h2>Update Profile</h2>
-        <label for="updateUsername">Username:</label>
-        <input type="text" id="updateUsername" name="updateUsername" required />
-        <label for="updateEmail">Email:</label>
-        <input type="email" id="updateEmail" name="updateEmail" required />
-        <label for="updatePassword">Password:</label>
-        <input
-          type="password"
-          id="updatePassword"
-          name="updatePassword"
-          required
-        />
-        <button type="submit">Update</button>
-        <button type="button" id="closeProfileModal">Cancel</button>
+    <dialog id="profileModal" class="modal-container">
+      <form id="profileForm" class="form-section">
+        <h2 class="form-title">Update Profile</h2>
+        <div class="form-group">
+          <label for="updateUsername">Username:</label>
+          <input type="text" id="updateUsername" name="updateUsername" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label for="updateEmail">Email:</label>
+          <input type="email" id="updateEmail" name="updateEmail" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label for="updatePassword">Password:</label>
+          <input type="password" id="updatePassword" name="updatePassword" class="form-input" required />
+        </div>
+        <div class="button-group">
+          <button type="submit" class="primary-btn">Update</button>
+          <button type="button" id="closeProfileModal" class="secondary-btn">Cancel</button>
+        </div>
+      </form>
+
+      <div class="form-divider">
+        <span>or</span>
+      </div>
+
+      <form id="avatar-form" enctype="multipart/form-data" class="form-section">
+        <h2 class="form-title">Change Profile Picture</h2>
+        <div class="form-group">
+          <label for="avatar" class="file-label">Choose an image</label>
+          <input type="file" id="avatar" name="avatar" accept="image/*" required class="file-input">
+        </div>
+        <button type="submit" class="primary-btn submit-pic-btn">Upload Image</button>
       </form>
     </dialog>
 
