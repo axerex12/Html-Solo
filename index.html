@@ -119,6 +119,13 @@
     </dialog>
 
     <dialog id="profileModal" class="modal-container">
+      <div class="profile-picture-section">
+        <div class="current-avatar-container">
+          <img id="currentProfilePicture" src="/default-avatar.jpg" alt="Current profile picture" class="profile-avatar">
+        </div>
+        <h3 class="profile-username" id="displayUsername">Username</h3>
+      </div>
+
       <form id="profileForm" class="form-section">
         <h2 class="form-title">Update Profile</h2>
         <div class="form-group">
@@ -175,6 +182,9 @@
             required
             class="file-input"
           />
+        </div>
+        <div class="image-preview-container">
+          <img id="imagePreview" class="image-preview" style="display: none;">
         </div>
         <button type="submit" class="primary-btn submit-pic-btn">
           Upload Image

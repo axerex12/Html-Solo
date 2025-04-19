@@ -2,6 +2,8 @@ const profileBtn = document.getElementById('profileBtn');
 const profileModal = document.getElementById('profileModal');
 const closeProfileModal = document.getElementById('closeProfileModal');
 const loginBtn = document.getElementById('loginBtn');
+const currentProfilePicture = document.getElementById('currentProfilePicture');
+const modalUsername = document.getElementById('displayUsername');
 document.getElementById('avatar-form').addEventListener('submit', changeAvatar);
 document
   .getElementById('profileForm')
@@ -13,6 +15,8 @@ export const showProfileButton = () => {
 
 // Open profile modal
 profileBtn.addEventListener('click', () => {
+  currentProfilePicture.src = document.getElementById('profileImage').src;
+  modalUsername.textContent = document.getElementById('profileUsername').textContent
   profileModal.showModal();
 });
 

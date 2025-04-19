@@ -276,7 +276,8 @@ body {
   font-weight: 500;
 }
 
-.submit-button:hover, .cancel-button:hover {
+.submit-button:hover,
+.cancel-button:hover {
   opacity: 0.9;
 }
 
@@ -296,7 +297,8 @@ body {
     flex-direction: column;
   }
 
-  .restaurant-table, .restaurant-map {
+  .restaurant-table,
+  .restaurant-map {
     max-width: 100%;
     width: 100%;
   }
@@ -431,7 +433,7 @@ label {
 
 .form-divider::before,
 .form-divider::after {
-  content: "";
+  content: '';
   flex: 1;
   border-bottom: 1px solid #dee2e6;
 }
@@ -459,4 +461,42 @@ label {
 
 .file-label:hover {
   background-color: #e9ecef;
+}
+
+.profile-picture-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.current-avatar-container {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ddd;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-username {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.image-preview-container {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
