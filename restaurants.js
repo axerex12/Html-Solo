@@ -8,10 +8,10 @@ const modal = document.querySelector('#modal');
 const sodexoButton = document.getElementById('sodexoB');
 const compassButton = document.getElementById('compassB');
 const menuButton = document.getElementById('weekday');
+const showfav = document.getElementById('Favourite');
 let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
-
 
 const getFavRestaurant = async () => {
   try {
@@ -86,7 +86,7 @@ const createTable = (restaurantsToShow = restaurants) => {
   `;
 
   restaurantsToShow.forEach(async (restaurant) => {
-    const { _id } = restaurant;
+    const {_id} = restaurant;
     const tr = restaurantRow(restaurant);
     table.append(tr);
 
@@ -95,10 +95,9 @@ const createTable = (restaurantsToShow = restaurants) => {
       console.log('favorites', favorites, _id);
 
       let isFavorite = Boolean;
-      if(favorites === _id) {
+      if (favorites === _id) {
         isFavorite = true;
-      }
-      else {
+      } else {
         isFavorite = false;
       }
 
@@ -111,11 +110,21 @@ const createTable = (restaurantsToShow = restaurants) => {
         // Fetch and display the daily or weekly menu
         if (currentMenu === 'daily') {
           const courseResponse = await getDailyMenu(_id, 'fi');
-          modal.innerHTML = restaurantModal(restaurant, courseResponse, localStorage.getItem('token'), isFavorite);
+          modal.innerHTML = restaurantModal(
+            restaurant,
+            courseResponse,
+            localStorage.getItem('token'),
+            isFavorite
+          );
           modal.showModal();
         } else if (currentMenu === 'weekly') {
           const courseResponse = await getWeeklyMenu(_id, 'fi');
-          modal.innerHTML = restaurantModal(restaurant, courseResponse, localStorage.getItem('token'), isFavorite);
+          modal.innerHTML = restaurantModal(
+            restaurant,
+            courseResponse,
+            localStorage.getItem('token'),
+            isFavorite
+          );
           modal.showModal();
         }
 
@@ -149,7 +158,7 @@ const handleFilterClick = (company, filterName) => {
   } else {
     // Apply the filter
     currentFilter = filterName;
-    const buttons = { sodexo: sodexoButton, compass: compassButton };
+    const buttons = {sodexo: sodexoButton, compass: compassButton};
     Object.values(buttons).forEach((btn) => btn.classList.remove('active'));
     buttons[filterName].classList.add('active');
 
@@ -182,6 +191,55 @@ compassButton.addEventListener('click', () =>
 );
 
 menuButton.addEventListener('click', () => handleMenuClick());
+
+showfav.addEventListener('click', async () => {
+  try {
+    const favId = await getFavRestaurant();
+    if (!localStorage.getItem('token')) {
+      alert('Please log in to view your favorite restaurant.');
+      return;
+    }
+
+    const favoriteRestaurant = restaurants.find(
+      (restaurant) => restaurant._id === favId
+    );
+    if (!favoriteRestaurant) {
+      console.error('Favorite restaurant not found in the list.');
+      return;
+    }
+
+    const isFavorite = true;
+    const courseResponse =
+      currentMenu === 'daily'
+        ? await getDailyMenu(favId, 'fi')
+        : await getWeeklyMenu(favId, 'fi');
+
+    modal.innerHTML = restaurantModal(
+      favoriteRestaurant,
+      courseResponse,
+      localStorage.getItem('token'),
+      isFavorite
+    );
+    modal.showModal();
+
+    if (
+      favoriteRestaurant.location &&
+      favoriteRestaurant.location.coordinates
+    ) {
+      const [longitude, latitude] = favoriteRestaurant.location.coordinates;
+      panToCoordinates([latitude, longitude]);
+    } else {
+      console.error(
+        `No valid coordinates for restaurant: ${favoriteRestaurant.name}`
+      );
+    }
+  } catch (error) {
+    console.error(
+      'An error occurred while showing the favorite restaurant:',
+      error
+    );
+  }
+});
 
 // Main function to initialize the app
 const main = async () => {
