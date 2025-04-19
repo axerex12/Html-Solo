@@ -53,6 +53,35 @@ body {
   transform: translateY(-1px);
 }
 
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+.profile-button:hover {
+  background-color: #f0f0f0;
+}
+
+.profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #ccc; /* Fallback color */
+}
+
+.profile-username {
+  font-weight: 500;
+  color: #333;
+}
+
 /* Main Content */
 .main-content {
   padding: 0 2rem;

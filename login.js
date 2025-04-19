@@ -4,8 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginModal = document.getElementById('loginModal');
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginForm = document.getElementById('loginForm');
+  const profileUsername = document.getElementById('profileUsername');
+  const profileFormSubmit = document.getElementById('profileForm')
 
   let isLoggedIn = false;
+
+  profileFormSubmit.addEventListener('submit', (e) => {
+    e.preventDefault();
+    isLoggedIn = false;
+  });
 
   loginBtn.addEventListener('click', () => {
     if (isLoggedIn) {
@@ -15,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loginBtn.textContent = 'Login';
       profileBtn.style.display = 'none'; // Hide profile button on logout
       alert('Logged out successfully!');
+      profileUsername.textContent = '';
     } else {
       loginModal.showModal();
     }
@@ -75,6 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const data = await response.json();
     localStorage.setItem('token', data.token); // Save token to localStorage
+    profileUsername.textContent = username || 'User';
     return true; // Return true to indicate successful login
   }
 });
+
+
