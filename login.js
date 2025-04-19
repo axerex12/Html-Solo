@@ -5,17 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeLoginModal = document.getElementById('closeLoginModal');
   const loginForm = document.getElementById('loginForm');
   const profileUsername = document.getElementById('profileUsername');
-  const profilePictureElement = document.getElementById('avatar');
+  const profilePictureElement = document.getElementById('profileImage');
   const profileFormSubmit = document.getElementById('profileForm');
 
   let isLoggedIn = false;
 
-  // Load profile picture and username from localStorage on page load
-  const savedProfilePicture = localStorage.getItem('profilePicture');
+  // Load username from localStorage on page load
   const savedUsername = localStorage.getItem('username');
-  if (savedProfilePicture) {
-    profilePictureElement.src = savedProfilePicture;
-  }
   if (savedUsername) {
     profileUsername.textContent = savedUsername;
   }
@@ -30,13 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Handle logout
       isLoggedIn = false;
       localStorage.removeItem('token');
-      localStorage.removeItem('profilePicture');
       localStorage.removeItem('username');
       loginBtn.textContent = 'Login';
       profileBtn.style.display = 'none'; // Hide profile button on logout
       alert('Logged out successfully!');
       profileUsername.textContent = '';
-      profilePictureElement.src = '/images/default.png'; // Reset to default picture
     } else {
       loginModal.showModal();
     }
@@ -74,6 +68,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  async function fetchProfile() {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(
+        'https://media2.edu.metropolia.fi/restaurant/api/v1/users/token',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Virhe käyttäjän tietojen lataamisessa:', error);
+      alert('Jokin meni pieleen, yritä uudelleen.');
+    }
+  }
+
   async function login(username, password) {
     const response = await fetch(
       'https://media2.edu.metropolia.fi/restaurant/api/v1/auth/login',
@@ -92,14 +108,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const data = await response.json();
-    localStorage.setItem('token', data.token); // Save token to localStorage
-    localStorage.setItem('username', username); // Save username to localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('username', username);
     profileUsername.textContent = username || 'User';
 
-    // Check for profile picture
-    const profilePicture = data.avatar || '/images/default.png'; // Use default if none exists
-    localStorage.setItem('profilePicture', profilePicture); // Save profile picture to localStorage
-    profilePictureElement.src = profilePicture;
+    const profileData = await fetchProfile();
+    console.log('Profile data!!!!!!!!!!:', profileData.avatar);
+
+    if (profileData.avatar) {
+      profilePictureElement.src = `https://media2.edu.metropolia.fi/restaurant/uploads/${profileData.avatar}`;
+    } else {
+      profilePictureElement.src = '../images/icon.png';
+    }
 
     return true; // Return true to indicate successful login
   }

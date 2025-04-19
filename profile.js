@@ -21,7 +21,6 @@ closeProfileModal.addEventListener('click', () => {
   profileModal.close();
 });
 
-
 async function changeAvatar(event) {
   event.preventDefault();
 

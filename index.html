@@ -22,7 +22,13 @@
       <h1>Restaurant Finder</h1>
       <div class="auth-buttons">
         <button id="profileBtn" style="display: none" class="profile-button">
-          <img id = "profileImage" src="/images/default.png" alt="Profile" class="profile-pic" id="profilePic">
+          <img
+            id="profileImage"
+            src=""
+            alt="Profile"
+            class="profile-pic"
+            id="profilePic"
+          />
           <span class="profile-username" id="profileUsername">Username</span>
         </button>
         <button id="loginBtn" class="auth-button login">Login</button>
@@ -32,7 +38,9 @@
 
     <main class="main-content">
       <div class="filter-buttons">
-        <button id="Favourite" class="filter-button">Open Favourite Restaurant</button>
+        <button id="Favourite" class="filter-button">
+          Open Favourite Restaurant
+        </button>
         <button id="sodexoB" class="filter-button">Sodexo Restaurants</button>
         <button id="compassB" class="filter-button">Compass Restaurants</button>
         <button id="weekday" class="filter-button">Weekly/Daily Menu</button>
@@ -115,19 +123,39 @@
         <h2 class="form-title">Update Profile</h2>
         <div class="form-group">
           <label for="updateUsername">Username:</label>
-          <input type="text" id="updateUsername" name="updateUsername" class="form-input" required />
+          <input
+            type="text"
+            id="updateUsername"
+            name="updateUsername"
+            class="form-input"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="updateEmail">Email:</label>
-          <input type="email" id="updateEmail" name="updateEmail" class="form-input" required />
+          <input
+            type="email"
+            id="updateEmail"
+            name="updateEmail"
+            class="form-input"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="updatePassword">Password:</label>
-          <input type="password" id="updatePassword" name="updatePassword" class="form-input" required />
+          <input
+            type="password"
+            id="updatePassword"
+            name="updatePassword"
+            class="form-input"
+            required
+          />
         </div>
         <div class="button-group">
           <button type="submit" class="primary-btn">Update</button>
-          <button type="button" id="closeProfileModal" class="secondary-btn">Cancel</button>
+          <button type="button" id="closeProfileModal" class="secondary-btn">
+            Cancel
+          </button>
         </div>
       </form>
 
@@ -139,9 +167,18 @@
         <h2 class="form-title">Change Profile Picture</h2>
         <div class="form-group">
           <label for="avatar" class="file-label">Choose an image</label>
-          <input type="file" id="avatar" name="avatar" accept="image/*" required class="file-input">
+          <input
+            type="file"
+            id="avatar"
+            name="avatar"
+            accept="image/*"
+            required
+            class="file-input"
+          />
         </div>
-        <button type="submit" class="primary-btn submit-pic-btn">Upload Image</button>
+        <button type="submit" class="primary-btn submit-pic-btn">
+          Upload Image
+        </button>
       </form>
     </dialog>
 

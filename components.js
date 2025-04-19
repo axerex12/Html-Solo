@@ -76,9 +76,7 @@ export const restaurantModal = (
     );
     if (favoriteButton) {
       favoriteButton.addEventListener('click', () => {
-        console.log(
-          `Favorite button clicked for restaurant ID: ${_id}`
-        );
+        console.log(`Favorite button clicked for restaurant ID: ${_id}`);
         updateFavoriteRestaurant(_id);
       });
     }
@@ -91,27 +89,28 @@ export async function updateFavoriteRestaurant(restaurantId) {
   const token = localStorage.getItem('token');
 
   try {
-      const response = await fetch('https://media2.edu.metropolia.fi/restaurant/api/v1/users', {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-              favouriteRestaurant: restaurantId,
-          }),
-      });
+    const response = await fetch(
+      'https://media2.edu.metropolia.fi/restaurant/api/v1/users',
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          favouriteRestaurant: restaurantId,
+        }),
+      }
+    );
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-          console.error(data.message);
-          return;
-      }else
-
-      console.log('Suosikkiravintola päivitetty:', data);
-      alert('Ravintola lisätty suosikiksi!');
+    if (!response.ok) {
+      console.error(data.message);
+      return;
+    } else console.log('Suosikkiravintola päivitetty:', data);
+    alert('Ravintola lisätty suosikiksi!');
   } catch (error) {
-      console.error(error);
+    console.error(error);
   }
 }
