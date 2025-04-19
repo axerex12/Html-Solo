@@ -169,6 +169,29 @@ body {
   font-weight: bold;
 }
 
+.restaurant-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s ease;
+}
+
+.favorite-btn:hover svg {
+  fill: gold;
+  opacity: 0.7;
+}
+
+.favorite-btn.favorited svg {
+  fill: gold;
+}
+
 /* Map Styles */
 .restaurant-map {
   flex: 1;

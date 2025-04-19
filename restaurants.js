@@ -12,6 +12,34 @@ let currentFilter = null;
 let currentMenu = 'daily';
 let restaurants = [];
 
+
+const getFavRestaurant = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${baseUrl}/users/token`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error fetching favorite restaurant:', errorData.message);
+      return null;
+    }
+
+    const data = await response.json();
+    let favId = data.favouriteRestaurant;
+
+    return favId;
+  } catch (error) {
+    console.error('Error fetching favorite restaurant:', error);
+    return null;
+  }
+};
+
 const getWeeklyMenu = async (id, lang) => {
   try {
     return await fetchData(`${baseUrl}/restaurants/weekly/${id}/${lang}`);
@@ -57,26 +85,37 @@ const createTable = (restaurantsToShow = restaurants) => {
   </tr>
   `;
 
-  restaurantsToShow.forEach((restaurant) => {
+  restaurantsToShow.forEach(async (restaurant) => {
     const { _id } = restaurant;
     const tr = restaurantRow(restaurant);
     table.append(tr);
 
     tr.addEventListener('click', async () => {
+      const favorites = await getFavRestaurant();
+      console.log('favorites', favorites, _id);
+
+      let isFavorite = Boolean;
+      if(favorites === _id) {
+        isFavorite = true;
+      }
+      else {
+        isFavorite = false;
+      }
+
       try {
         document.querySelectorAll('.highlight').forEach((elem) => {
           elem.classList.remove('highlight');
         });
         tr.classList.add('highlight');
 
-        // Fetch and display the daily menu
+        // Fetch and display the daily or weekly menu
         if (currentMenu === 'daily') {
           const courseResponse = await getDailyMenu(_id, 'fi');
-          modal.innerHTML = restaurantModal(restaurant, courseResponse);
+          modal.innerHTML = restaurantModal(restaurant, courseResponse, localStorage.getItem('token'), isFavorite);
           modal.showModal();
         } else if (currentMenu === 'weekly') {
           const courseResponse = await getWeeklyMenu(_id, 'fi');
-          modal.innerHTML = restaurantModal(restaurant, courseResponse);
+          modal.innerHTML = restaurantModal(restaurant, courseResponse, localStorage.getItem('token'), isFavorite);
           modal.showModal();
         }
 
@@ -151,7 +190,7 @@ const main = async () => {
     sortRestaurants();
     createTable();
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error('error', error);
   }
 };
 
@@ -167,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
       restaurant.city.toLowerCase().includes(searchValue)
     );
 
-    console.log('Filtered restaurants by city:', filteredRestaurants); // Debugging log
     createTable(filteredRestaurants);
     addMarkers(filteredRestaurants); // Update the table and map markers
   });
