@@ -56,13 +56,16 @@ body {
 .profile-button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 20px;
-  transition: background-color 0.3s;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  height: auto;
+  margin: 0;
+  background-color: transparent;
 }
 
 .profile-button:hover {
@@ -70,16 +73,24 @@ body {
 }
 
 .profile-pic {
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #ccc; /* Fallback color */
+  background-color: #e0e0e0;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .profile-username {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  display: grid;
 }
 
 /* Main Content */
